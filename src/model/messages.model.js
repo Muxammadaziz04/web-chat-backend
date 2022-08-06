@@ -24,6 +24,21 @@ const postMessageModel = async (message_body, user_id, dialog_id) => {
     }
 }
 
+const messageViewedModel = async (message_id, user_id) => {
+    try {
+        const messageViewedQuery = `
+        update messages set viewed = true where 
+        message_id = $1 and 
+        message_from != $2 and 
+        array[concat((select dialog_id from messages where message_id = $1), '')] <@ (select user_chats from users where user_id = $2)
+        returning *
+        `
+        return await fetchData(messageViewedQuery, message_id, user_id)
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports = {
-    getMessagesModel, postMessageModel
+    getMessagesModel, postMessageModel, messageViewedModel
 }

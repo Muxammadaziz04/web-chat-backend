@@ -1,4 +1,4 @@
-const { getMessagesModel, postMessageModel } = require("../model/messages.model")
+const { getMessagesModel, postMessageModel, messageViewedModel } = require("../model/messages.model")
 const jwt = require("../utils/jwt")
 
 const getMessages = async(req, res, next) => {
@@ -39,6 +39,25 @@ const postMessage = async(req, res, next) => {
     }
 }
 
+const messageViewed = async(req, res, next) => {
+    try {
+        const { user_id } = jwt.verify(req.headers.token)
+        const { message_id } = req.params
+
+        const response = await messageViewedModel(message_id, user_id)
+
+        if(response.error || !response.length) return next(response)
+
+        res.status(200).send({
+            status: 200,
+            message: "message was successfully updated",
+            data: response
+        })
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports = {
-    getMessages, postMessage
+    getMessages, postMessage, messageViewed
 }
