@@ -1,8 +1,9 @@
 const { getDialogsModel } = require("../model/dialogs.model");
+const jwt = require("../utils/jwt");
 
 const getDialogs = async(req, res, next) => {
     try {
-        const {user_id} = req.body
+        const { user_id } = jwt.verify(req.headers.token)
 
         const response = await getDialogsModel(user_id)
 

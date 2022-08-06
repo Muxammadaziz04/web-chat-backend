@@ -4,7 +4,7 @@ const { getMessages, postMessage } = require('../controllers/messages.controller
 const Router = express.Router()
 
 
-Router.post('/messages/:dialog_id', getMessages)
+Router.get('/messages/:dialog_id', getMessages)
 Router.post('/message/:dialog_id', postMessage)
 
 

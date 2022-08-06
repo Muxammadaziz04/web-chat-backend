@@ -1,9 +1,10 @@
 const { getMessagesModel, postMessageModel } = require("../model/messages.model")
+const jwt = require("../utils/jwt")
 
 const getMessages = async(req, res, next) => {
     try {
         const { dialog_id } = req.params
-        const { user_id } = req.body
+        const { user_id } = jwt.verify(req.headers.token)
         
         const response = await getMessagesModel(dialog_id, user_id)
 
@@ -21,7 +22,8 @@ const getMessages = async(req, res, next) => {
 const postMessage = async(req, res, next) => {
     try {
         const { dialog_id } = req.params
-        const { user_id, message_body } = req.body
+        const { message_body } = req.body
+        const { user_id } = jwt.verify(req.headers.token)
         
         const response = await postMessageModel(message_body, user_id, dialog_id)
 
