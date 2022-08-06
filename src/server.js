@@ -10,7 +10,9 @@ app.use(express.json())
 app.use(chatsRouter)
 app.use(messagesRouter)
 
-
+app.use((error, req, res, next) => {
+    return res.send({ error: error.error?.message || "somethink went wrong"})
+})
 
 app.listen(process.env.PORT || 5000, () => {
     console.log(`Server is run on ${process.env.PORT || 5000} port`);
