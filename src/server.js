@@ -2,6 +2,7 @@ const express = require('express')
 
 const chatsRouter = require('./routers/dialogs.router.js')
 const messagesRouter = require('./routers/messages.router.js')
+const usersRouter = require('./routers/users.router.js')
 
 const app = express()
 
@@ -9,6 +10,7 @@ const app = express()
 app.use(express.json())
 app.use(chatsRouter)
 app.use(messagesRouter)
+app.use(usersRouter)
 
 app.use((error, req, res, next) => {
     return res.send({ error: error.error?.message || "somethink went wrong"})
