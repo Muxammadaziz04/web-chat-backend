@@ -8,7 +8,7 @@ const getDialogsModel = async (user_id) => {
                 select d.*, json_agg(u.*) as companion, json_agg(m.*) as last_message from dialogs as d 
                 left join  (select * from messages order by created_at desc limit 1) as m 
                 on m.dialog_id = d.dialog_id
-                left join users as u 
+                left join (select concat(first_name, ' ', last_name) as fullname, * from users) as u 
                 on array[concat(u.user_id, '')] <@ array[d.dialog_members] and u.user_id != $1
                 group by d.dialog_id
             ) 

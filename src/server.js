@@ -1,4 +1,5 @@
 const express = require('express')
+const cors = require('cors')
 
 const chatsRouter = require('./routers/dialogs.router.js')
 const messagesRouter = require('./routers/messages.router.js')
@@ -8,6 +9,7 @@ const app = express()
 
 
 app.use(express.json())
+app.use(cors())
 app.use(chatsRouter)
 app.use(messagesRouter)
 app.use(usersRouter)
