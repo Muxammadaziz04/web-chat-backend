@@ -5,8 +5,6 @@ create extension citext;
 
 create type action as enum('online', 'offline')
 
-
-
 drop table if exists users;
 create table users(
     user_id uuid default uuid_generate_v4() primary key,
@@ -19,15 +17,11 @@ create table users(
     user_dialogs text[]
 );
 
-
-
 drop table if exists dialogs;
 create table dialogs(
     dialog_id uuid default uuid_generate_v4() primary key,
     dialog_members text[] not null
 );
-
-
 
 drop table if exists messages;
 create table messages(
@@ -39,6 +33,11 @@ create table messages(
     viewed boolean default false
 );
 
+drop table if exists online_users;
+create table online_users(
+    user_id text not null,
+    user_email citext unique not null
+);
 
 
 insert into dialogs (dialog_id, dialog_members) values ('d4bf74f9-77e1-466b-819b-6ee22148ec23', array['0912eee5-1b21-4b4e-82c4-af4439be2d03', 'ee14b3f7-4d14-4aef-8993-3e5312b1a0a7']);

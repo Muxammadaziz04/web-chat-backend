@@ -1,11 +1,17 @@
 const express = require('express')
+const { createServer } = require("http");
+const { Server } = require("socket.io");
 const cors = require('cors')
 
 const chatsRouter = require('./routers/dialogs.router.js')
 const messagesRouter = require('./routers/messages.router.js')
-const usersRouter = require('./routers/users.router.js')
+const usersRouter = require('./routers/users.router.js');
+const { postOnlineUserModel, getOnlineUserModel, deleteOnlineUserModel } = require('./model/onlineUsers.model.js');
+const { disconnect, join } = require('./soket/index.js');
 
 const app = express()
+const httpServer = createServer(app);
+const io = new Server(httpServer);
 
 
 app.use(express.json())
@@ -15,10 +21,17 @@ app.use(messagesRouter)
 app.use(usersRouter)
 
 app.use((error, req, res, next) => {
-    return res.send({ error: error.error?.message || "somethink went wrong"})
+    return res.send({ error: error.error?.message || "somethink went wrong" })
 })
 
-app.listen(process.env.PORT || 5000, () => {
+const users = {}
+
+io.on("connection", (socket) => {
+    socket.on('join', data => join(data, socket, io))
+    socket.on('disconnect', () => disconnect(socket, io));
+})
+
+httpServer.listen(process.env.PORT || 5000, () => {
     console.log(`Server is run on ${process.env.PORT || 5000} port`);
 })
 
