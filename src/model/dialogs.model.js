@@ -6,14 +6,16 @@ const getDialogsModel = async (user_id) => {
         select * from (select * from 
             (
                 select d.*, json_agg(u.*) as companion, json_agg(m.*) as last_message from dialogs as d 
-                left join  (select * from messages order by created_at desc limit 1) as m 
+                left join  (select distinct on (dialog_id) * from messages order by dialog_id, created_at desc) as m 
                 on m.dialog_id = d.dialog_id
                 left join (select concat(first_name, ' ', last_name) as fullname, * from users) as u 
                 on array[concat(u.user_id, '')] <@ array[d.dialog_members] and u.user_id != $1
                 group by d.dialog_id
             ) 
             as dialogs
-        where array[concat($1, '')] <@ dialog_members) as e;
+        where array[concat($1, '')] <@ dialog_members
+        order by last_message->0->>'created_at' desc nulls last
+        ) as e
         `
         return await fetchData(getUserDialogsQuery, user_id)
     } catch (error) {
@@ -21,20 +23,21 @@ const getDialogsModel = async (user_id) => {
     }
 }
 
-module.exports = {
-    getDialogsModel
+const getDialogIdModel = async(user_id, companion_id) => {
+    try {
+        const getDialogIdQuery = `select dialog_id from dialogs where array[$1, $2] <@ dialog_members and array_length(dialog_members, 1) = 2`
+        return await fetchData(getDialogIdQuery, user_id, companion_id)
+    } catch (error) {
+        console.log(error);
+    }
 }
 
-const l = `
-select * from (select * from 
-    (
-        select d.*, json_agg(u.*) as companion, json_agg(m.*) from dialogs as d 
-        left join (select * from messages order by created_at desc limit 1) as m 
-        on m.dialog_id = d.dialog_id
-        left join users as u 
-        on array[concat(u.user_id, '')] <@ array[d.dialog_members] and u.user_id != '0912eee5-1b21-4b4e-82c4-af4439be2d03'
-        group by d.dialog_id
-    ) 
-    as dialogs
-where array[concat('0912eee5-1b21-4b4e-82c4-af4439be2d03', '')] <@ dialog_members) as e;
+module.exports = {
+    getDialogsModel,
+    getDialogIdModel
+}
+
+const q = `
+select * from dialogs where array[concat($1, '')] <@ dialog_members
+
 `

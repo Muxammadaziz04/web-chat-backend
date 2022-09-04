@@ -1,18 +1,22 @@
+const { getDialogIdModel } = require("../model/dialogs.model")
 const { getMessagesModel, postMessageModel, messageViewedModel } = require("../model/messages.model")
+const { getUserInfoModel } = require("../model/users.model")
 const jwt = require("../utils/jwt")
 
 const getMessages = async(req, res, next) => {
     try {
-        const { dialog_id } = req.params
+        const { companion_id } = req.params
         const { user_id } = jwt.verify(req.headers.token)
         
-        const response = await getMessagesModel(dialog_id, user_id)
+        const messages = await getMessagesModel(user_id, companion_id)
+        const dialog_id = await getDialogIdModel(user_id, companion_id)
+        const user = await getUserInfoModel(companion_id)
 
-        if(response.error) return next(response)
+        if(messages.error || !user.length) return next(messages)
 
         res.status(200).send({
             status: 200,
-            data: response
+            data: { messages, user: user[0], dialog_id: dialog_id[0]}
         })
     } catch (error) {
         console.log(error);

@@ -1,12 +1,10 @@
-const { setActionModel, setlastSeemModel } = require("../model/users.model");
+const { setActionModel, setlastSeemModel, getUserInfoModel } = require("../model/users.model");
 const jwt = require("../utils/jwt");
 
 const setAction = async(req, res, next) => {
     try {
         const { user_id } = jwt.verify(req.headers.token)
-
         const response = await setActionModel(user_id)
-
         if(response.error || !response.length) return next(response)
 
         res.status(201).send({
@@ -25,7 +23,6 @@ const setLastSeem = async(req, res, next) => {
         const date = new Date().toISOString()
 
         const response = await setlastSeemModel(date, user_id)
-
         if(response.error || !response.length) return next(response)
 
         res.status(201).send({
@@ -38,8 +35,22 @@ const setLastSeem = async(req, res, next) => {
     }
 }
 
+const getUserInfo = async(req, res, next) => {
+    try {
+        const response = await getUserInfoModel(req.params)
+        if(response.error) return next(response)
+
+        res.status(200).send({
+            status: 200,
+            data: response
+        })
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 module.exports = {
     setAction,
-    setLastSeem
+    setLastSeem,
+    getUserInfo
 }

@@ -4,7 +4,7 @@ const { getMessages, postMessage, messageViewed } = require('../controllers/mess
 const Router = express.Router()
 
 
-Router.get('/messages/:dialog_id', getMessages)
+Router.get('/messages/:companion_id', getMessages)
 Router.post('/message/:dialog_id', postMessage)
 Router.put('/viewed/:message_id', messageViewed)
 

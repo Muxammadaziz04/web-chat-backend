@@ -1,13 +1,13 @@
 const { fetchData } = require('../utils/postgres.js')
 
-const getMessagesModel = async (dialog_id, user_id) => {
+const getMessagesModel = async (user_id, companion_id) => {
     try {
         const getMessagesQuery = `
-        select * from messages where dialog_id = $1
-        and array[$2] <@ (select dialog_members from dialogs where dialog_id = $1)
-        order by created_at;
+        select * from messages 
+        where dialog_id = (select dialog_id from dialogs where array[$1, $2] <@ dialog_members and array_length(dialog_members, 1) = 2)
+        order by created_at
         `
-        return await fetchData(getMessagesQuery, dialog_id, user_id)
+        return await fetchData(getMessagesQuery, user_id, companion_id)
     } catch (error) {
         console.log(error);
     }

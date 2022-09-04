@@ -10,7 +10,7 @@ const join = (data, socket, io) => {
                     getOnlineUserModel(user)
                         .then(res => {
                             if (res[0]?.user_id) {
-                                io.to(res[0]?.user_id).emit('NEW_USER_ONLINE', { user: socket.email })
+                                io.to(res[0]?.user_id).emit('NEW_USER_ONLINE', { user: socket.email, status: 'online' })
                             }
                         })
                 })
@@ -26,8 +26,8 @@ const disconnect = (socket, io) => {
             .then((res) => {
                 if (res[0]?.user_email == socket.email) {
                     socket.companions?.forEach(async (user) => {
-                        let res = await getOnlineUserModel(user)
-                        io.to(res[0]?.user_id).emit('USER_EXIT', { user: socket.email })
+                        const res = await getOnlineUserModel(user)
+                        io.to(res[0]?.user_id).emit('USER_EXIT', { user: socket.email, status: 'offline' })
                     })
                 }
             })
@@ -36,7 +36,17 @@ const disconnect = (socket, io) => {
     }
 }
 
+const sendMessage = async(data, io) => {
+    try {
+        const res = await getOnlineUserModel(data.companion_email)
+        io.to(res[0].user_id).emit('NEW_MESSAGE', data.data)
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports = {
     join,
-    disconnect
+    disconnect,
+    sendMessage
 }

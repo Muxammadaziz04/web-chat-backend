@@ -23,15 +23,24 @@ const setActionModel = async (user_id) => {
 const setlastSeemModel = async (date, user_id) => {
     try {
         const setLastSeemQuery = `update users set last_seem = $1, user_action = 'offline' where user_id = $2 returning *`
-
         return await fetchData(setLastSeemQuery, date, user_id)
     } catch (error) {
         console.log(error);
     }
 }
 
+const getUserInfoModel = async (user_id) => {
+    try {
+        const getUserInfoQuery = `select *, concat(first_name, ' ', last_name) as fullname from users where user_id = $1`
+        return await fetchData(getUserInfoQuery, user_id)
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports = {
-    loginModel, 
-    setActionModel, 
-    setlastSeemModel
+    loginModel,
+    setActionModel,
+    setlastSeemModel,
+    getUserInfoModel
 }
