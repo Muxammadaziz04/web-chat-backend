@@ -5,7 +5,12 @@ const getDialogsModel = async (user_id) => {
         const getUserDialogsQuery = `
         select * from (select * from 
             (
-                select d.*, json_agg(u.*) as companion, json_agg(m.*) as last_message from dialogs as d 
+                select 
+                    d.*, 
+                    json_agg(u.*) as companion, 
+                    json_agg(m.*) as last_message ,
+                    (select count(*) from messages where dialog_id = d.dialog_id and message_from != $1 and viewed = false) as notificate
+                from dialogs as d 
                 left join  (select distinct on (dialog_id) * from messages order by dialog_id, created_at desc) as m 
                 on m.dialog_id = d.dialog_id
                 left join (select concat(first_name, ' ', last_name) as fullname, * from users) as u 

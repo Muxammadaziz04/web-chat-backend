@@ -13,12 +13,12 @@ const getMessagesModel = async (user_id, companion_id) => {
     }
 }
 
-const postMessageModel = async (message_body, user_id, dialog_id) => {
+const postMessageModel = async (message_body, user_id, companion_id) => {
     try {
         const postMessageQuery = `
-        insert into messages (message_body, message_from, dialog_id) values($1, $2, $3) returning *
+        insert into messages (message_body, message_from, dialog_id) values($1, $2::uuid, (select dialog_id from dialogs where array[$2::text, $3::text] <@ dialog_members)) returning *
         `
-        return await fetchData(postMessageQuery, message_body, user_id, dialog_id)
+        return await fetchData(postMessageQuery, message_body, user_id, companion_id)
     } catch (error) {
         console.log(error);
     }

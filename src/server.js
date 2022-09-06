@@ -7,7 +7,7 @@ const chatsRouter = require('./routers/dialogs.router.js')
 const messagesRouter = require('./routers/messages.router.js')
 const usersRouter = require('./routers/users.router.js');
 const { postOnlineUserModel, getOnlineUserModel, deleteOnlineUserModel } = require('./model/onlineUsers.model.js');
-const { disconnect, join, sendMessage } = require('./soket/index.js');
+const { disconnect, join, sendMessage, changeMsgStatus } = require('./soket/index.js');
 
 const app = express()
 const httpServer = createServer(app);
@@ -27,7 +27,8 @@ app.use((error, req, res, next) => {
 io.on("connection", (socket) => {
     socket.on('USER_JOIN', data => join(data, socket, io))
     socket.on('disconnect', () => disconnect(socket, io));
-    socket.on('SEND_MESSAGE', data => sendMessage(data, io))
+    socket.on('SEND_MESSAGE', data => sendMessage(data, io, socket))
+    socket.on('MESSAGE_VIEWED', data => changeMsgStatus(data, io))
 })
 
 httpServer.listen(process.env.PORT || 5000, () => {

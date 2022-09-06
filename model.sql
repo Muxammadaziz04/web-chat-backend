@@ -35,8 +35,8 @@ create table messages(
 
 drop table if exists online_users;
 create table online_users(
-    user_id text not null,
-    user_email citext unique not null
+    user_id uuid references users(user_id) not null,
+    socket_id text not null
 );
 
 
