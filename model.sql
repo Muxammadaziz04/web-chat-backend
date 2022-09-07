@@ -3,24 +3,25 @@ create database chat;
 create extension "uuid-ossp";
 create extension citext;
 
-create type action as enum('online', 'offline')
+create type action_type as enum('online', 'offline')
 
 drop table if exists users;
 create table users(
     user_id uuid default uuid_generate_v4() primary key,
     first_name varchar(30) not null,
     last_name varchar(30),
-    user_action action default 'offline',
+    username varchar(100) unique,
+    user_action action_type default 'offline',
     last_seem timestamp with time zone default current_timestamp,
     email citext unique not null,
     user_avatar text check (user_avatar ~ '^((ftp|http|https):\/\/)?(www\.)?([A-Za-zА-Яа-я0-9]{1}[A-Za-zА-Яа-я0-9\-]*\.?)*\.{1}[A-Za-zА-Яа-я0-9-]{2,8}(\/([\w#!:.?+=&%@!\-\/])*)?'),
-    user_dialogs text[]
+    user_dialogs uuid[]
 );
 
 drop table if exists dialogs;
 create table dialogs(
     dialog_id uuid default uuid_generate_v4() primary key,
-    dialog_members text[] not null
+    dialog_members uuid[] not null
 );
 
 drop table if exists messages;
@@ -40,11 +41,10 @@ create table online_users(
 );
 
 
-insert into dialogs (dialog_id, dialog_members) values ('d4bf74f9-77e1-466b-819b-6ee22148ec23', array['0912eee5-1b21-4b4e-82c4-af4439be2d03', 'ee14b3f7-4d14-4aef-8993-3e5312b1a0a7']);
-insert into dialogs (dialog_id, dialog_members) values ('a61052dd-c9fe-48d9-93e7-7ce3836b4d04', array['0912eee5-1b21-4b4e-82c4-af4439be2d03', '47f48144-b399-429c-83ae-be8fa4029a55']);
-insert into dialogs (dialog_id, dialog_members) values ('9f13dc4e-8903-4ff1-bd0d-303c45e3f82c', array['ee14b3f7-4d14-4aef-8993-3e5312b1a0a7', '47f48144-b399-429c-83ae-be8fa4029a55']);
+insert into dialogs (dialog_id, dialog_members) values ('d4bf74f9-77e1-466b-819b-6ee22148ec23', array['0912eee5-1b21-4b4e-82c4-af4439be2d03'::uuid, 'ee14b3f7-4d14-4aef-8993-3e5312b1a0a7'::uuid]);
+insert into dialogs (dialog_id, dialog_members) values ('a61052dd-c9fe-48d9-93e7-7ce3836b4d04', array['0912eee5-1b21-4b4e-82c4-af4439be2d03'::uuid, '47f48144-b399-429c-83ae-be8fa4029a55'::uuid]);
 
-
+update users set user_dialogs = array_append(user_dialogs, 'd4bf74f9-77e1-466b-819b-6ee22148ec23') where user_id = 'ee14b3f7-4d14-4aef-8993-3e5312b1a0a7';
 
 select * from dialogs where array['ee14b3f7-4d14-4aef-8993-3e5312b1a0a7', '0912eee5-1b21-4b4e-82c4-af4439be2d03'] <@ dialog_members;
 
@@ -55,9 +55,9 @@ where (select dialog_id from chats where array['47f48144-b399-429c-83ae-be8fa402
 
 
 
-insert into users (first_name, email) values ('Muhammadaziz', 'muxammadazizramziddinov@gmail.com');
-insert into users (first_name, email) values ('Said', 'said@gmail.com');
-insert into users (first_name, email) values ('Ali', 'ali@gmail.com');
+insert into users (first_name, email, user_id) values ('Muhammadaziz', 'muxammadazizramziddinov@gmail.com', '0912eee5-1b21-4b4e-82c4-af4439be2d03');
+insert into users (first_name, email, user_id) values ('Said', 'said@gmail.com', 'ee14b3f7-4d14-4aef-8993-3e5312b1a0a7');
+insert into users (first_name, email, user_id) values ('Ali', 'ali@gmail.com', '47f48144-b399-429c-83ae-be8fa4029a55');
 
 
 

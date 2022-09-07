@@ -1,6 +1,6 @@
-const { getDialogIdModel } = require("../model/dialogs.model")
-const { getMessagesModel, postMessageModel, messageViewedModel } = require("../model/messages.model")
-const { getUserInfoModel } = require("../model/users.model")
+const { getDialogIdModel } = require("../models/dialogs.model")
+const { getMessagesModel, postMessageModel, messageViewedModel } = require("../models/messages.model")
+const { getUserInfoModel } = require("../models/users.model")
 const jwt = require("../utils/jwt")
 
 const getMessages = async(req, res, next) => {

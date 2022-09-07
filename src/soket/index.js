@@ -1,4 +1,4 @@
-const { postOnlineUserModel, getOnlineUserModel, deleteOnlineUserModel } = require("../model/onlineUsers.model");
+const { postOnlineUserModel, getOnlineUserModel, deleteOnlineUserModel } = require("../models/onlineUsers.model");
 
 const join = async (data, socket, io) => {
     try {

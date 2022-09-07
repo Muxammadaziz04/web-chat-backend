@@ -1,4 +1,4 @@
-const { setActionModel, setlastSeemModel, getUserInfoModel } = require("../model/users.model");
+const { setActionModel, setlastSeemModel, getUserInfoModel } = require("../models/users.model");
 const jwt = require("../utils/jwt");
 
 const setAction = async(req, res, next) => {
