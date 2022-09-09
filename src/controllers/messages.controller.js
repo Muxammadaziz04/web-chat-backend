@@ -48,8 +48,7 @@ const messageViewed = async(req, res, next) => {
         const { message_id } = req.params
 
         const response = await messageViewedModel(message_id, user_id)
-
-        if(response.error || !response.length) return next(response)
+        if(response?.error || !response?.length) return next(response)
 
         res.status(200).send({
             status: 200,

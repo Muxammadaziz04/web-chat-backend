@@ -22,7 +22,7 @@ app.use(usersRouter)
 app.use(searchRouter)
 
 app.use((error, req, res, next) => {
-    return res.send({ error: error.error?.message || "somethink went wrong" })
+    return res.send({ error: error.error || error.error?.message || "somethink went wrong" })
 })
 
 io.on("connection", (socket) => {
