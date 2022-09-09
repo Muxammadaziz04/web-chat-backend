@@ -1,9 +1,9 @@
-const { fetchData } = require('../utils/postgres.js')
+const { fetchOne } = require('../utils/postgres.js')
 
 const getDialogsModel = async (user_id) => {
     try {
         const getUserDialogsQuery = `
-        select * from (select * from 
+        select json_agg(e.*) as dialogs from (select * from 
             (
                 select 
                     d.*, 
@@ -22,7 +22,7 @@ const getDialogsModel = async (user_id) => {
         order by last_message->0->>'created_at' desc nulls last
         ) as e
         `
-        return await fetchData(getUserDialogsQuery, user_id)
+        return await fetchOne(getUserDialogsQuery, user_id)
     } catch (error) {
         console.log(error);
     }
@@ -31,9 +31,20 @@ const getDialogsModel = async (user_id) => {
 const getDialogIdModel = async(user_id, companion_id) => {
     try {
         const getDialogIdQuery = `select dialog_id from dialogs where array[$1::uuid, $2::uuid] <@ dialog_members and array_length(dialog_members, 1) = 2`
-        return await fetchData(getDialogIdQuery, user_id, companion_id)
+        return await fetchOne(getDialogIdQuery, user_id, companion_id)
     } catch (error) {
         console.log(error);
+    }
+}
+
+const postDialogModel = async () => {
+    try {
+        const postDialogQuery = `
+        
+        `
+        return await fetchOne(postDialogQuery)
+    } catch (error) {
+        
     }
 }
 

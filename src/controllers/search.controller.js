@@ -5,14 +5,13 @@ const jwt = require("../utils/jwt");
 const searchUsers = async(req, res, next) => {
     try {
         const { user_id } = jwt.verify(req.headers.token)
-        console.log(!! req.query.value);
         const response = req.query.value ? await searchModel(user_id, req.query) : await getDialogsModel(user_id)
 
         if(response.error) return next(response)
 
         res.status(200).send({
             status: 200,
-            data: response[0]
+            data: response
         })
     } catch (error) {
         console.log(error);

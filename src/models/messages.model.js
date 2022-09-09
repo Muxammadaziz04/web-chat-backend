@@ -1,4 +1,4 @@
-const { fetchData } = require('../utils/postgres.js')
+const { fetchData, fetchOne } = require('../utils/postgres.js')
 
 const getMessagesModel = async (user_id, companion_id) => {
     try {
@@ -18,7 +18,7 @@ const postMessageModel = async (message_body, user_id, companion_id) => {
         const postMessageQuery = `
         insert into messages (message_body, message_from, dialog_id) values($1, $2::uuid, (select dialog_id from dialogs where array[$2::uuid, $3::uuid] <@ dialog_members)) returning *
         `
-        return await fetchData(postMessageQuery, message_body, user_id, companion_id)
+        return await fetchOne(postMessageQuery, message_body, user_id, companion_id)
     } catch (error) {
         console.log(error);
     }
@@ -33,7 +33,7 @@ const messageViewedModel = async (message_id, user_id) => {
         array[(select dialog_id from messages where message_id = $1)] <@ (select user_dialogs from users where user_id = $2)
         returning *
         `
-        return await fetchData(messageViewedQuery, message_id, user_id)
+        return await fetchOne(messageViewedQuery, message_id, user_id)
     } catch (error) {
         console.log(error);
     }

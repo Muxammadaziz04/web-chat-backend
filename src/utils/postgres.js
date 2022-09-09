@@ -16,6 +16,20 @@ async function fetchData(query, ...array){
     }
 }
 
+async function fetchOne(query, ...array){
+    const client = await pool.connect()
+    try {
+        array = array.filter(arg => arg != undefined)
+        let { rows: [row] } = await client.query(query, array.length ? array : null)
+        return row
+    } catch (error) {
+        return { error }
+    }finally{
+        await client.release()
+    }
+}
+
 module.exports = {
-    fetchData
+    fetchData,
+    fetchOne
 }

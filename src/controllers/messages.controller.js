@@ -7,16 +7,15 @@ const getMessages = async(req, res, next) => {
     try {
         const { companion_id } = req.params
         const { user_id } = jwt.verify(req.headers.token)
-        
         const messages = await getMessagesModel(user_id, companion_id)
         const dialog_id = await getDialogIdModel(user_id, companion_id)
         const user = await getUserInfoModel(companion_id)
 
-        if(messages.error || !user.length) return next(messages)
+        if(messages.error) return next(messages)
 
         res.status(200).send({
             status: 200,
-            data: { messages, user: user[0], dialog_id: dialog_id[0]}
+            data: { messages, user: user, dialog_id}
         })
     } catch (error) {
         console.log(error);
@@ -31,7 +30,7 @@ const postMessage = async(req, res, next) => {
         
         const response = await postMessageModel(message_body, user_id, dialog_id)
 
-        if(response.error || !response.length) return next(response)
+        if(response.error) return next(response)
 
         res.status(201).send({
             status: 201,
