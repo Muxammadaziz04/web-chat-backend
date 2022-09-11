@@ -1,15 +1,15 @@
 const sha256 = require('sha256')
 const { fetchData, fetchOne } = require('../utils/postgres.js')
 
-const registerModel = async ({first_name, email, password, last_name}) => {
+const registerModel = async ({ first_name, email, password, last_name }) => {
     try {
         const loginQuery = `
         select * from users where email = $1
         `
         const user = await fetchData(loginQuery, email)
 
-        if(user[0]){
-            return {error: 'A user with this name exists'}
+        if (user[0]) {
+            return { error: 'A user with this email exists' }
         }
 
         const registerQuery = `
@@ -21,7 +21,7 @@ const registerModel = async ({first_name, email, password, last_name}) => {
     }
 }
 
-const loginModel = async ({email, password}) => {
+const loginModel = async ({ email, password }) => {
     try {
         const loginQuery = `
         select * from users where email = $1 and password = $2
@@ -59,43 +59,49 @@ const getUserInfoModel = async (user_id) => {
     }
 }
 
+const getUserInfoByIdModel = async ({ user_id }) => {
+    try {
+        const getUserInfoQuery = `select *, concat(first_name, ' ', last_name) as fullname from users where user_id = $1`
+        return await fetchOne(getUserInfoQuery, user_id)
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const putUserModel = async (body, user_id) => {
+    try {
+        const oldUserQuery = `select * from users where user_id = $1`
+        const oldUser = await fetchOne(oldUserQuery, user_id)
+
+        if(!oldUser) return null
+
+        const { first_name, last_name, username, user_avatar, user_info } = {
+            ...oldUser,
+            ...body
+        }
+
+        const arr =  { first_name, last_name, username, user_avatar, user_info }
+        const newArr = Object.entries(arr).filter(arg => arg[1] === null || arg[1] === undefined ? false : true)
+        let query = []
+        newArr.forEach((arg, index) => {
+            index +=2
+            query.push(`${arg[0]} = $${index}`);
+        })
+
+        const putUserQuery = `update users set
+        ${query.join(',')}
+        where user_id = $1 returning *
+        `
+        return await fetchOne(putUserQuery, user_id, first_name, last_name, username, user_avatar, user_info)
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 const deleteUserModel = async (user_id) => {
     try {
         const deleteUserQuery = `delete from user where user_id = $1`
-        return await fetchOne(deleteUserQuery, user_id)
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-const sendCode = async(user_id) => {
-    try {
-        const checkQuery = `
-        select * from waiting_users where user_id = $1
-        `
-        const user = await fetchData(checkQuery, user_id)
-
-        if(user[0]){
-            await fetchData(`delete from waiting_users where user_id = $1`, user_id)
-        }
-
-        const code = Math.floor(Math.random() * 9999)
-
-        const sendCodeQuery = `
-        insert into waiting_users (user_id, code) values ($1, $2) returning *
-        `
-        return await fetchOne(sendCodeQuery, user_id, code)
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-const checkCode = async({user_id}, {code}) => {
-    try {
-        const checkCodeQuery = `
-        select * from waiting_users where user_id = $1 and code = $2
-        `
-        return await fetchData(checkCodeQuery, user_id, code)
+        return await fetchOne(deleteUserQuery, user_id,)
     } catch (error) {
         console.log(error);
     }
@@ -104,10 +110,10 @@ const checkCode = async({user_id}, {code}) => {
 module.exports = {
     loginModel,
     registerModel,
-    sendCode,
-    checkCode,
     setActionModel,
     setlastSeemModel,
     getUserInfoModel,
-    deleteUserModel
+    deleteUserModel,
+    getUserInfoByIdModel,
+    putUserModel
 }

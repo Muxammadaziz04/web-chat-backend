@@ -2,7 +2,10 @@ const express = require('express')
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const cors = require('cors')
+const fileUpload = require('express-fileupload')
+
 const { disconnect, join, sendMessage, changeMsgStatus } = require('./soket/index.js');
+const checkToken = require('./middleware/checkToken')
 
 const chatsRouter = require('./routers/dialogs.router.js')
 const messagesRouter = require('./routers/messages.router.js')
@@ -16,13 +19,16 @@ const io = new Server(httpServer);
 
 app.use(express.json())
 app.use(cors())
+app.use(fileUpload())
+app.use(checkToken)
+
 app.use(chatsRouter)
 app.use(messagesRouter)
 app.use(usersRouter)
 app.use(searchRouter)
 
 app.use((error, req, res, next) => {
-    return res.send({ error: error.error || error.error?.message || "somethink went wrong" })
+    return res.send({ error: error.error?.message || error.error || "somethink went wrong" })
 })
 
 io.on("connection", (socket) => {

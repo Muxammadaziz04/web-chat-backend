@@ -11,6 +11,16 @@ const pgConfig = {
     port: process.env.PG_PORT
 }
 
+const firebaseConfig = {
+    apiKey: "AIzaSyBqNBqhnYejHBWsj3CoxHLWBYHplKd7sgw",
+    authDomain: "web-chat-9c26d.firebaseapp.com",
+    projectId: "web-chat-9c26d",
+    storageBucket: "web-chat-9c26d.appspot.com",
+    messagingSenderId: "295510934974",
+    appId: "1:295510934974:web:7e1c4ae606990a1d6be5ef",
+    measurementId: "G-LBV5J9QJEZ"
+  };
+
 module.exports = {
-    PORT, pgConfig
+    PORT, pgConfig, firebaseConfig
 }

@@ -46,8 +46,10 @@ create table online_users(
 
 drop table if exists waiting_users;
 create table waiting_users(
-    user_id uuid references users(user_id) not null,
-    code int not null
+    code_id uuid default uuid_generate_v4(),
+    user_email citext unique not null,
+    code int not null,
+    user_obj json not null
 );
 
 insert into users (first_name, email, user_id, password) values ('Muhammadaziz', 'muxammadazizramziddinov@gmail.com', '0912eee5-1b21-4b4e-82c4-af4439be2d03', 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f');

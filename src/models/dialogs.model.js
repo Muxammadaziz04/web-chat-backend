@@ -1,4 +1,4 @@
-const { fetchOne } = require('../utils/postgres.js')
+const { fetchOne, fetchData } = require('../utils/postgres.js')
 
 const getDialogsModel = async (user_id) => {
     try {
@@ -37,12 +37,16 @@ const getDialogIdModel = async(user_id, companion_id) => {
     }
 }
 
-const postDialogModel = async () => {
+const postDialogModel = async (user_id, companion_email) => {
     try {
+        const getDialogIfExists = `select * from dialogs where array[$1::uuid, (select user_id::uuid from users where email = $2)] <@ dialog_members`
+        const dialog = await fetchData(getDialogIfExists, user_id, companion_email)
+        if(dialog[0]) return dialog[0]
+
         const postDialogQuery = `
-        
+        insert into dialogs (dialog_members) values (array[$1::uuid, (select user_id::uuid from users where email = $2)]) returning *
         `
-        return await fetchOne(postDialogQuery)
+        return await fetchOne(postDialogQuery, user_id, companion_email)
     } catch (error) {
         
     }
@@ -50,5 +54,6 @@ const postDialogModel = async () => {
 
 module.exports = {
     getDialogsModel,
-    getDialogIdModel
+    getDialogIdModel,
+    postDialogModel
 }
