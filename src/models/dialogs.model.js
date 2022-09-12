@@ -46,7 +46,13 @@ const postDialogModel = async (user_id, companion_email) => {
         const postDialogQuery = `
         insert into dialogs (dialog_members) values (array[$1::uuid, (select user_id::uuid from users where email = $2)]) returning *
         `
-        return await fetchOne(postDialogQuery, user_id, companion_email)
+        const newDialog = await fetchOne(postDialogQuery, user_id, companion_email)
+
+        const userQuery = `
+        select concat(first_name, ' ', last_name) as fullname, * from users where email = $1
+        `
+        const user = await fetchOne(userQuery, companion_email)
+        return {...newDialog, companion: [user]}
     } catch (error) {
         
     }

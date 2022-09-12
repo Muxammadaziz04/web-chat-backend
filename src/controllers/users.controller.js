@@ -28,7 +28,8 @@ const login = async(req, res, next) => {
 
         res.status(201).send({
             status: 201,
-            data: {user: response, token}
+            user: response, 
+            token
         })
     } catch (error) {
         console.log(error);

@@ -13,7 +13,7 @@ const registerModel = async ({ first_name, email, password, last_name }) => {
         }
 
         const registerQuery = `
-        insert into users (first_name, email, password ${last_name ? ',last_name' : ''}) values ($1, $2, $3 ${last_name ? ',$4' : ''}) returning *
+        insert into users (first_name, email, password ${last_name && ', last_name'}) values ($1, $2, $3 ${last_name && ', $4'}) returning *
         `
         return await fetchOne(registerQuery, first_name, email, sha256(password), last_name)
     } catch (error) {

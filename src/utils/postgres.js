@@ -19,7 +19,7 @@ async function fetchData(query, ...array){
 async function fetchOne(query, ...array){
     const client = await pool.connect()
     try {
-        array = array.filter(arg => arg === undefined || arg === null ? false : true)
+        array = array.filter(arg => arg === undefined || arg === null || arg === '' ? false : true)
         let { rows: [row] } = await client.query(query, array.length ? array : null)
         return row
     } catch (error) {

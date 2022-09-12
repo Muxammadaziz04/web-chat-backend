@@ -2,6 +2,13 @@ const { fetchData } = require('../utils/postgres.js')
 
 const postOnlineUserModel = async (user_id, socket_id) => {
     try {
+        const oldUserQuery = `select * from online_users where user_id = $1`
+        const oldUser = await fetchData(oldUserQuery, user_id)
+        if(oldUser[0]){
+            const deleteOnlineUserQuery = `
+            delete from online_users where user_id = $1 returning *`
+            await fetchData(deleteOnlineUserQuery, user_id)
+        }
         const postOnlineUserQuery = `
         insert into online_users(user_id, socket_id) values ($1, $2) returning *
         `

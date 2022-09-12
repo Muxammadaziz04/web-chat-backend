@@ -8,7 +8,7 @@ const join = async (data, socket, io) => {
         socket.companions?.forEach(async (user_id) => {
             const onlineUser = await getOnlineUserModel(user_id)
             if (onlineUser[0]?.socket_id) {
-                io.to(onlineUser.socket_id).emit('NEW_USER_ONLINE', { user_id: socket.user_id, status: 'online' })
+                io.to(onlineUser[0].socket_id).emit('NEW_USER_ONLINE', { user_id: socket.user_id, status: 'online' })
             }
         })
     } catch (error) {
@@ -23,7 +23,7 @@ const disconnect = async (socket, io) => {
             socket.companions?.forEach(async (user_id) => {
                 const onlineUser = await getOnlineUserModel(user_id)
                 if(onlineUser[0]?.socket_id){
-                    io.to(onlineUser?.socket_id).emit('USER_EXIT', { user_id: socket.user_id, status: 'offline' })
+                    io.to(onlineUser[0]?.socket_id).emit('USER_EXIT', { user_id: socket.user_id, status: 'offline' })
                 }
             })
         }
@@ -36,7 +36,7 @@ const sendMessage = async (data, io, socket) => {
     try {
         const companion = await getOnlineUserModel(data.companion_id)
         if(companion[0]?.socket_id){
-            io.to(companion.socket_id).emit('NEW_MESSAGE', {data: data.data, companion_id: socket.user_id})
+            io.to(companion[0].socket_id).emit('NEW_MESSAGE', {data: data.data, companion_id: socket.user_id})
         }
     } catch (error) {
         console.log(error);
@@ -47,7 +47,7 @@ const changeMsgStatus = async(data, io) => {
     try {
         const companion = await getOnlineUserModel(data.companion_id)
         if(companion[0]?.socket_id){
-            io.to(companion.socket_id).emit('CHANGE_MSG_STATUS', {message_id: data.message_id})
+            io.to(companion[0].socket_id).emit('CHANGE_MSG_STATUS', {message_id: data.message_id})
         }
     } catch (error) {
         console.log(error);
