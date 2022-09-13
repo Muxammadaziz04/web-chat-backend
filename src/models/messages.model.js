@@ -18,7 +18,13 @@ const postMessageModel = async (message_body, user_id, companion_id) => {
         const postMessageQuery = `
         insert into messages (message_body, message_from, dialog_id) values($1, $2::uuid, (select dialog_id from dialogs where array[$2::uuid, $3::uuid] <@ dialog_members)) returning *
         `
-        return await fetchOne(postMessageQuery, message_body, user_id, companion_id)
+        const newMsg = await fetchOne(postMessageQuery, message_body, user_id, companion_id)
+        const setDialogsQuery = `update users set user_dialogs = array_append(user_dialogs, $1::uuid) where (user_id = $2 or user_id = $3) and 
+        ((array[$1::uuid] <@ (select user_dialogs from users where user_id = $2) != true) and (array[$1::uuid] <@ (select user_dialogs from users where user_id = $3) != true))`
+        await fetchData(setDialogsQuery, newMsg.dialog_id, user_id, companion_id)
+        const userQuery = `select * from users where user_id = $1`
+        const user = await fetchOne(userQuery, user_id)
+        return {msg: newMsg, user}
     } catch (error) {
         console.log(error);
     }

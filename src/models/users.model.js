@@ -81,7 +81,7 @@ const putUserModel = async (body, user_id) => {
         }
 
         const arr =  { first_name, last_name, username, user_avatar, user_info }
-        const newArr = Object.entries(arr).filter(arg => arg[1] === null || arg[1] === undefined ? false : true)
+        const newArr = Object.entries(arr).filter(arg => arg[1] === null || arg[1] === undefined || arg[1] === '' ? false : true)
         let query = []
         newArr.forEach((arg, index) => {
             index +=2

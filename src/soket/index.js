@@ -36,7 +36,7 @@ const sendMessage = async (data, io, socket) => {
     try {
         const companion = await getOnlineUserModel(data.companion_id)
         if(companion[0]?.socket_id){
-            io.to(companion[0].socket_id).emit('NEW_MESSAGE', {data: data.data, companion_id: socket.user_id})
+            io.to(companion[0].socket_id).emit('NEW_MESSAGE', data)
         }
     } catch (error) {
         console.log(error);
