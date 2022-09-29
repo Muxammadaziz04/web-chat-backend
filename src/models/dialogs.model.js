@@ -39,6 +39,10 @@ const getDialogIdModel = async(user_id, companion_id) => {
 
 const postDialogModel = async (user_id, companion_email) => {
     try {
+        const getUser = `select * from users where email = $1`
+        const companion = await fetchData(getUser, companion_email)
+        if(!companion[0]) return null
+
         const getDialogIfExists = `select * from dialogs where array[$1::uuid, (select user_id::uuid from users where email = $2)] <@ dialog_members`
         const dialog = await fetchData(getDialogIfExists, user_id, companion_email)
         if(dialog[0]) return dialog[0]

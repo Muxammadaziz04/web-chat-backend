@@ -6,7 +6,7 @@ const getDialogs = async(req, res, next) => {
         const { user_id } = jwt.verify(req.headers.token)
         const response = await getDialogsModel(user_id)
 
-        if(response.error) return next(response)
+        if(response?.error) return next(response)
 
         res.status(200).send({
             status: 200,

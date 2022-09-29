@@ -19,7 +19,7 @@ create table users(
     password text not null,
     user_info text,
     user_avatar text check (user_avatar ~ '^((ftp|http|https):\/\/)?(www\.)?([A-Za-zА-Яа-я0-9]{1}[A-Za-zА-Яа-я0-9\-]*\.?)*\.{1}[A-Za-zА-Яа-я0-9-]{2,8}(\/([\w#!:.?+=&%@!\-\/])*)?'),
-    user_dialogs uuid[]
+    user_dialogs uuid[] default array[]::uuid[]
 );
 
 drop table if exists dialogs;
