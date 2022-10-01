@@ -4,10 +4,10 @@ const join = async (data, socket, io) => {
     try {
         socket.user_id = data.user_id
         socket.companions = data.companions
-        await postOnlineUserModel(socket.user_id, data.id)
+        await postOnlineUserModel(socket.user_id, socket.id)
         socket.companions?.forEach(async (user_id) => {
             const onlineUser = await getOnlineUserModel(user_id)
-            if (onlineUser[0]?.socket_id) {
+            if (onlineUser && onlineUser[0]?.socket_id) {
                 io.to(onlineUser[0].socket_id).emit('NEW_USER_ONLINE', { user_id: socket.user_id, status: 'online' })
             }
         })
@@ -21,8 +21,7 @@ const disconnect = async (socket, io) => {
         const deletedUser = await deleteOnlineUserModel(socket.user_id)
         socket.companions?.forEach(async (user_id) => {
             const onlineUser = await getOnlineUserModel(user_id)
-            if (onlineUser[0]?.socket_id) {
-                console.log(onlineUser[0]?.socket_id);
+            if (onlineUser && onlineUser[0]?.socket_id) {
                 io.to(onlineUser[0]?.socket_id).emit('USER_EXIT', { user_id: socket.user_id, status: 'offline' })
             }
         })
