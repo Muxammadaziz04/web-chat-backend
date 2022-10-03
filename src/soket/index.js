@@ -6,6 +6,7 @@ const join = async (data, socket, io) => {
     try {
         socket.user_id = data.user_id
         socket.companions = data.companions
+        socket.user_id = jwt.verify(data.token).user_id
         await postOnlineUserModel(socket.user_id, socket.id)
         socket.companions?.forEach(async (user_id) => {
             const onlineUser = await getOnlineUserModel(user_id)
@@ -20,6 +21,8 @@ const join = async (data, socket, io) => {
 
 const disconnect = async (socket, io) => {
     try {
+        const date = new Date().toISOString()
+        await setlastSeemModel(date, socket.user_id)
         await deleteOnlineUserModel(socket.user_id)
         socket.companions?.forEach(async (user_id) => {
             const onlineUser = await getOnlineUserModel(user_id)
